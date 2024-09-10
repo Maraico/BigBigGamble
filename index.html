@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Punkte-System</title>
+    <title>Punkte-System mit Glücksrad</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,115 +17,110 @@
             padding: 20px;
             text-align: center;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+        h3 {
             text-align: center;
         }
-        th {
-            background-color: #f4f4f4;
-        }
-        form {
-            margin: 20px;
-        }
-        label {
-            margin-right: 10px;
-        }
-        input[type="text"], input[type="number"] {
-            padding: 5px;
-            margin-right: 10px;
-        }
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .wheel-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ffeb3b;
+            border: 5px solid #f9a825;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            transition: transform 4s ease-out;
         }
-        input[type="submit"]:hover {
-            background-color: #45a049;
+        .wheel-container span {
+            font-size: 18px;
+            text-align: center;
+        }
+        #coin-display {
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Willkommen zum Punktesystem</h1>
+        <h1>Willkommen zum Punktesystem mit Glücksrad</h1>
     </header>
-    <main>
-        <h2>Leaderboard</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Spieler</th>
-                    <th>Punkte</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Punkte werden hier angezeigt -->
-            </tbody>
-        </table>
-        <h2>Neues Match eintragen</h2>
-        <form>
-            <label for="spieler1">Spieler 1:</label>
-            <input type="text" id="spieler1" name="spieler1" required>
-            <br><br>
-            <label for="spieler2">Spieler 2:</label>
-            <input type="text" id="spieler2" name="spieler2" required>
-            <br><br>
-            <label for="punkte">Punkte für Gewinner:</label>
-            <input type="number" id="punkte" name="punkte" min="1" max="10" required>
-            <br><br>
-            <input type="submit" value="Match eintragen">
-        </form>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.querySelector('form');
-                const table = document.querySelector('tbody');
-                const players = {};
 
-                function updateTable() {
-                    table.innerHTML = '';
-                    for (const player in players) {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${player}</td><td>${players[player]}</td>`;
-                        table.appendChild(tr);
-                    }
+    <h3 id="coin-display">Coins: 10</h3>
+
+    <!-- Glücksrad -->
+    <div class="wheel-container" id="wheel">
+        <span>🎯 Drehe mich!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wheel = document.getElementById('wheel');
+            const coinDisplay = document.getElementById('coin-display');
+            let coins = 10;  // Start-Coin-Betrag
+            let isSpinning = false;
+
+            // Optionen für das Glücksrad
+            const wheelOptions = ['+5 Coins', '-5 Coins', 'x2 Coins', '+10 Coins', '-10 Coins'];
+
+            // Aktualisiere die Coins-Anzeige
+            function updateCoinsDisplay() {
+                coinDisplay.textContent = `Coins: ${coins}`;
+            }
+
+            // Logik für das Ergebnis des Glücksrads
+            function applyWheelResult(result) {
+                switch (result) {
+                    case '+5 Coins':
+                        coins += 5;
+                        break;
+                    case '-5 Coins':
+                        coins = Math.max(0, coins - 5);
+                        break;
+                    case 'x2 Coins':
+                        coins *= 2;
+                        break;
+                    case '+10 Coins':
+                        coins += 10;
+                        break;
+                    case '-10 Coins':
+                        coins = Math.max(0, coins - 10);
+                        break;
                 }
+                updateCoinsDisplay();
+            }
 
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
+            // Logik für das Drehen des Glücksrads
+            wheel.addEventListener('click', function() {
+                if (isSpinning) return;
 
-                    const spieler1 = document.getElementById('spieler1').value.trim();
-                    const spieler2 = document.getElementById('spieler2').value.trim();
-                    const punkte = parseInt(document.getElementById('punkte').value, 10);
+                isSpinning = true;
+                const randomOption = wheelOptions[Math.floor(Math.random() * wheelOptions.length)];
+                const randomAngle = Math.random() * 360;
+                wheel.style.transform = `rotate(${randomAngle}deg)`;
 
-                    if (!spieler1 || !spieler2 || isNaN(punkte)) {
-                        return; // Eingaben sind ungültig
-                    }
-
-                    // Punkte zu Spielern hinzufügen oder aktualisieren
-                    if (!players[spieler1]) {
-                        players[spieler1] = 0;
-                    }
-                    if (!players[spieler2]) {
-                        players[spieler2] = 0;
-                    }
-                    players[spieler1] += punkte;
-
-                    // Aktualisiere die Tabelle
-                    updateTable();
-
-                    // Formular zurücksetzen
-                    form.reset();
-                });
+                // Ergebnis nach der Drehung
+                setTimeout(() => {
+                    applyWheelResult(randomOption);
+                    isSpinning = false;
+                }, 4000); // 4 Sekunden Wartezeit für die Drehanimation
             });
-        </script>
-    </main>
+
+            // Wenn Coins 0 sind, nach 1 Minute 10 neue Coins hinzufügen
+            setInterval(() => {
+                if (coins === 0) {
+                    coins += 10;
+                    updateCoinsDisplay();
+                }
+            }, 60000); // 1 Minute = 60000 Millisekunden
+
+            // Initiale Anzeige der Coins
+            updateCoinsDisplay();
+        });
+    </script>
 </body>
 </html>
