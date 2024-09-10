@@ -5,12 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punkte-System</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        header { background-color: #4CAF50; padding: 10px; color: white; text-align: center; }
-        main { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        th { background-color: #f4f4f4; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        form {
+            margin: 20px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -27,18 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Spieler 1</td>
-                    <td>10</td>
-                </tr>
-                <tr>
-                    <td>Spieler 2</td>
-                    <td>8</td>
-                </tr>
-                <tr>
-                    <td>Spieler 3</td>
-                    <td>6</td>
-                </tr>
+                <!-- Punkte werden hier angezeigt -->
             </tbody>
         </table>
         <h2>Neues Match eintragen</h2>
@@ -54,6 +83,30 @@
             <br><br>
             <input type="submit" value="Match eintragen">
         </form>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                const table = document.querySelector('tbody');
+
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const spieler1 = document.getElementById('spieler1').value;
+                    const spieler2 = document.getElementById('spieler2').value;
+                    const punkte = document.getElementById('punkte').value;
+
+                    const tr1 = document.createElement('tr');
+                    tr1.innerHTML = `<td>${spieler1}</td><td>${punkte}</td>`;
+                    table.appendChild(tr1);
+
+                    const tr2 = document.createElement('tr');
+                    tr2.innerHTML = `<td>${spieler2}</td><td>${punkte}</td>`;
+                    table.appendChild(tr2);
+
+                    form.reset();
+                });
+            });
+        </script>
     </main>
 </body>
 </html>
