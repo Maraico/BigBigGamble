@@ -37,11 +37,6 @@
             border: 5px solid #333;
             transition: transform 4s ease-out;
         }
-        #wheel canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
         #indicator {
             position: absolute;
             top: -20px;
@@ -142,6 +137,7 @@
 
             // Zeichne das Glücksrad
             function drawWheel() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // vorherige Inhalte löschen
                 for (let i = 0; i < segments; i++) {
                     const angle = i * segmentAngle;
                     ctx.beginPath();
@@ -253,6 +249,4 @@
             // Wenn Coins 0 sind, nach 1 Minute 10 neue Coins hinzufügen
             setInterval(() => {
                 if (coins === 0) {
-                    coins += 10;
-                    updateCoinsDisplay();
-                }
+                    coins += 10
