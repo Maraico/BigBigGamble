@@ -3,76 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Punkte-System mit Glücksrad</title>
+    <title>Maraicos Glücksrad</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         header {
             background-color: #4CAF50;
             color: white;
             padding: 20px;
             text-align: center;
+            width: 100%;
         }
-        h3 {
-            text-align: center;
+        h1 {
+            margin: 0;
         }
-        .wheel-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 120px;
-            height: 120px;
+        #wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-top: 50px;
+        }
+        #wheel {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background-color: #ffeb3b;
-            border: 5px solid #f9a825;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+            border: 5px solid #333;
             transition: transform 4s ease-out;
         }
-        .wheel-container span {
+        #wheel canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        #spin-button {
+            margin-top: 20px;
+            padding: 10px 20px;
             font-size: 18px;
-            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #spin-button:hover {
+            background-color: #45a049;
         }
         #coin-display {
             margin-top: 20px;
-            text-align: center;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Willkommen zum Punktesystem mit Glücksrad</h1>
+        <h1>Maraicos Glücksrad</h1>
     </header>
 
+    <div id="wheel-container">
+        <canvas id="wheel"></canvas>
+    </div>
+    <button id="spin-button">Drehen!</button>
     <h3 id="coin-display">Coins: 10</h3>
 
-    <!-- Glücksrad -->
-    <div class="wheel-container" id="wheel">
-        <span>🎯 Drehe mich!</span>
-    </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const wheel = document.getElementById('wheel');
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('wheel');
+            const ctx = canvas.getContext('2d');
             const coinDisplay = document.getElementById('coin-display');
-            let coins = 10;  // Start-Coin-Betrag
+            const spinButton = document.getElementById('spin-button');
+            let coins = 10; // Startbetrag
             let isSpinning = false;
+            let currentRotation = 0;
 
-            // Optionen für das Glücksrad
-            const wheelOptions = ['+5 Coins', '-5 Coins', 'x2 Coins', '+10 Coins', '-10 Coins'];
+            const segments = 10; // Anzahl der Segmente
+            const wheelOptions = ['+5 Coins', '-5 Coins', 'x2 Coins', '/2 Coins', '+10 Coins', '-10 Coins', '+15 Coins', '-15 Coins', 'x3 Coins', '/3 Coins'];
+            const segmentAngle = (2 * Math.PI) / segments;
 
-            // Aktualisiere die Coins-Anzeige
-            function updateCoinsDisplay() {
-                coinDisplay.textContent = `Coins: ${coins}`;
+            // Zeichne das Glücksrad
+            function drawWheel() {
+                for (let i = 0; i < segments; i++) {
+                    const angle = i * segmentAngle;
+                    ctx.beginPath();
+                    ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                    ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, angle, angle + segmentAngle);
+                    ctx.fillStyle = i % 2 === 0 ? '#ffeb3b' : '#f44336'; // Wechselnde Farben
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Text im Segment anzeigen
+                    ctx.save();
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(angle + segmentAngle / 2);
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = '#000';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(wheelOptions[i], canvas.width / 2 - 10, 10);
+                    ctx.restore();
+                }
             }
 
-            // Logik für das Ergebnis des Glücksrads
+            // Ergebnis des Glücksrads anwenden
             function applyWheelResult(result) {
                 switch (result) {
                     case '+5 Coins':
@@ -84,31 +121,70 @@
                     case 'x2 Coins':
                         coins *= 2;
                         break;
+                    case '/2 Coins':
+                        coins = Math.floor(coins / 2);
+                        break;
                     case '+10 Coins':
                         coins += 10;
                         break;
                     case '-10 Coins':
                         coins = Math.max(0, coins - 10);
                         break;
+                    case '+15 Coins':
+                        coins += 15;
+                        break;
+                    case '-15 Coins':
+                        coins = Math.max(0, coins - 15);
+                        break;
+                    case 'x3 Coins':
+                        coins *= 3;
+                        break;
+                    case '/3 Coins':
+                        coins = Math.floor(coins / 3);
+                        break;
                 }
                 updateCoinsDisplay();
             }
 
-            // Logik für das Drehen des Glücksrads
-            wheel.addEventListener('click', function() {
+            // Aktualisiere die Coin-Anzeige
+            function updateCoinsDisplay() {
+                coinDisplay.textContent = `Coins: ${coins}`;
+            }
+
+            // Drehe das Rad
+            function spinWheel() {
                 if (isSpinning) return;
 
                 isSpinning = true;
-                const randomOption = wheelOptions[Math.floor(Math.random() * wheelOptions.length)];
-                const randomAngle = Math.random() * 360;
-                wheel.style.transform = `rotate(${randomAngle}deg)`;
+                const randomAngle = Math.random() * 360 + 720; // Mindestens 2 volle Umdrehungen
+                const finalAngle = randomAngle % 360;
 
-                // Ergebnis nach der Drehung
-                setTimeout(() => {
-                    applyWheelResult(randomOption);
-                    isSpinning = false;
-                }, 4000); // 4 Sekunden Wartezeit für die Drehanimation
-            });
+                // Animation
+                const spinDuration = 4000; // 4 Sekunden
+                const start = performance.now();
+
+                function animate(time) {
+                    const progress = Math.min((time - start) / spinDuration, 1);
+                    currentRotation = randomAngle * progress;
+                    canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Ergebnis berechnen
+                        const selectedSegment = Math.floor((segments - (finalAngle / 360) * segments) % segments);
+                        applyWheelResult(wheelOptions[selectedSegment]);
+                        isSpinning = false;
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+
+            // Starte das Drehen bei Klick
+            spinButton.addEventListener('click', spinWheel);
+
+            // Initiales Zeichnen des Rads
+            drawWheel();
 
             // Wenn Coins 0 sind, nach 1 Minute 10 neue Coins hinzufügen
             setInterval(() => {
@@ -118,7 +194,7 @@
                 }
             }, 60000); // 1 Minute = 60000 Millisekunden
 
-            // Initiale Anzeige der Coins
+            // Zeige die initiale Anzahl der Coins an
             updateCoinsDisplay();
         });
     </script>
