@@ -46,7 +46,7 @@
             position: absolute;
             top: -20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) rotate(0deg);
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
@@ -69,6 +69,33 @@
         #coin-display {
             margin-top: 20px;
             font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+        #coin-display img {
+            width: 30px;
+            margin-right: 10px;
+        }
+        #reward-display {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 2px solid #333;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+        #reward-display button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -82,14 +109,26 @@
         <div id="indicator"></div>
     </div>
     <button id="spin-button">Drehen!</button>
-    <h3 id="coin-display">Coins: 10</h3>
+
+    <div id="coin-display">
+        <img src="https://example.com/mario_coin.png" alt="Coin">
+        <span id="coins">10</span>
+    </div>
+
+    <div id="reward-display">
+        <h2 id="reward-text"></h2>
+        <button id="ok-button">OK</button>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const canvas = document.getElementById('wheel');
             const ctx = canvas.getContext('2d');
-            const coinDisplay = document.getElementById('coin-display');
+            const coinDisplay = document.getElementById('coins');
             const spinButton = document.getElementById('spin-button');
+            const rewardDisplay = document.getElementById('reward-display');
+            const rewardText = document.getElementById('reward-text');
+            const okButton = document.getElementById('ok-button');
             let coins = 10; // Startbetrag
             let isSpinning = false;
             let currentRotation = 0;
@@ -163,7 +202,7 @@
 
             // Aktualisiere die Coin-Anzeige
             function updateCoinsDisplay() {
-                coinDisplay.textContent = `Coins: ${coins}`;
+                coinDisplay.textContent = coins;
             }
 
             // Drehe das Rad
@@ -189,8 +228,16 @@
                         // Ergebnis berechnen und nach dem Stopp Coins zuweisen
                         const selectedSegment = Math.floor((segments - (finalAngle / 360) * segments) % segments);
                         setTimeout(() => {
-                            applyWheelResult(wheelOptions[selectedSegment]);
-                            isSpinning = false;
+                            const result = wheelOptions[selectedSegment];
+                            rewardText.textContent = `Du hast ${result} gewonnen!`;
+                            rewardDisplay.style.display = 'block';
+
+                            // Zeige den Gewinn erst nach OK-Button an
+                            okButton.onclick = () => {
+                                rewardDisplay.style.display = 'none';
+                                applyWheelResult(result);
+                                isSpinning = false;
+                            };
                         }, 500); // kleine Verzögerung, um den Effekt zu verstärken
                     }
                 }
@@ -209,11 +256,3 @@
                     coins += 10;
                     updateCoinsDisplay();
                 }
-            }, 60000); // 1 Minute = 60000 Millisekunden
-
-            // Zeige die initiale Anzahl der Coins an
-            updateCoinsDisplay();
-        });
-    </script>
-</body>
-</html>
