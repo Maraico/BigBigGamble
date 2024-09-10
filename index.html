@@ -73,13 +73,13 @@
         <h2>Neues Match eintragen</h2>
         <form>
             <label for="spieler1">Spieler 1:</label>
-            <input type="text" id="spieler1" name="spieler1">
+            <input type="text" id="spieler1" name="spieler1" required>
             <br><br>
             <label for="spieler2">Spieler 2:</label>
-            <input type="text" id="spieler2" name="spieler2">
+            <input type="text" id="spieler2" name="spieler2" required>
             <br><br>
             <label for="punkte">Punkte für Gewinner:</label>
-            <input type="number" id="punkte" name="punkte" min="1" max="10">
+            <input type="number" id="punkte" name="punkte" min="1" max="10" required>
             <br><br>
             <input type="submit" value="Match eintragen">
         </form>
@@ -87,22 +87,41 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const form = document.querySelector('form');
                 const table = document.querySelector('tbody');
+                const players = {};
+
+                function updateTable() {
+                    table.innerHTML = '';
+                    for (const player in players) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${player}</td><td>${players[player]}</td>`;
+                        table.appendChild(tr);
+                    }
+                }
 
                 form.addEventListener('submit', function(event) {
                     event.preventDefault();
 
-                    const spieler1 = document.getElementById('spieler1').value;
-                    const spieler2 = document.getElementById('spieler2').value;
-                    const punkte = document.getElementById('punkte').value;
+                    const spieler1 = document.getElementById('spieler1').value.trim();
+                    const spieler2 = document.getElementById('spieler2').value.trim();
+                    const punkte = parseInt(document.getElementById('punkte').value, 10);
 
-                    const tr1 = document.createElement('tr');
-                    tr1.innerHTML = `<td>${spieler1}</td><td>${punkte}</td>`;
-                    table.appendChild(tr1);
+                    if (!spieler1 || !spieler2 || isNaN(punkte)) {
+                        return; // Eingaben sind ungültig
+                    }
 
-                    const tr2 = document.createElement('tr');
-                    tr2.innerHTML = `<td>${spieler2}</td><td>${punkte}</td>`;
-                    table.appendChild(tr2);
+                    // Punkte zu Spielern hinzufügen oder aktualisieren
+                    if (!players[spieler1]) {
+                        players[spieler1] = 0;
+                    }
+                    if (!players[spieler2]) {
+                        players[spieler2] = 0;
+                    }
+                    players[spieler1] += punkte;
 
+                    // Aktualisiere die Tabelle
+                    updateTable();
+
+                    // Formular zurücksetzen
                     form.reset();
                 });
             });
