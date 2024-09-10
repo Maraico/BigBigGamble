@@ -42,6 +42,17 @@
             height: 100%;
             border-radius: 50%;
         }
+        #indicator {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid red;
+        }
         #spin-button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -68,6 +79,7 @@
 
     <div id="wheel-container">
         <canvas id="wheel"></canvas>
+        <div id="indicator"></div>
     </div>
     <button id="spin-button">Drehen!</button>
     <h3 id="coin-display">Coins: 10</h3>
@@ -85,6 +97,9 @@
             const segments = 10; // Anzahl der Segmente
             const wheelOptions = ['+5 Coins', '-5 Coins', 'x2 Coins', '/2 Coins', '+10 Coins', '-10 Coins', '+15 Coins', '-15 Coins', 'x3 Coins', '/3 Coins'];
             const segmentAngle = (2 * Math.PI) / segments;
+
+            canvas.width = 300;
+            canvas.height = 300;
 
             // Zeichne das Glücksrad
             function drawWheel() {
@@ -171,10 +186,12 @@
                     if (progress < 1) {
                         requestAnimationFrame(animate);
                     } else {
-                        // Ergebnis berechnen
+                        // Ergebnis berechnen und nach dem Stopp Coins zuweisen
                         const selectedSegment = Math.floor((segments - (finalAngle / 360) * segments) % segments);
-                        applyWheelResult(wheelOptions[selectedSegment]);
-                        isSpinning = false;
+                        setTimeout(() => {
+                            applyWheelResult(wheelOptions[selectedSegment]);
+                            isSpinning = false;
+                        }, 500); // kleine Verzögerung, um den Effekt zu verstärken
                     }
                 }
                 requestAnimationFrame(animate);
