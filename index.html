@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Rebuilding site -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -31,12 +30,12 @@
             height: 300px;
             margin-top: 50px;
         }
-        #wheel {
+        canvas#wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             border: 5px solid #333;
-            transition: transform 4s ease-out;
+            background: #fff; /* Hintergrundfarbe für den Canvas */
         }
         #indicator {
             position: absolute;
@@ -250,4 +249,11 @@
             // Wenn Coins 0 sind, nach 1 Minute 10 neue Coins hinzufügen
             setInterval(() => {
                 if (coins === 0) {
-                    coins += 10
+                    coins += 10;
+                    updateCoinsDisplay(); // Stelle sicher, dass die Anzeige aktualisiert wird
+                }
+            }, 60000); // Jede Minute 10 neue Coins
+        });
+    </script>
+</body>
+</html>
