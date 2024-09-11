@@ -39,14 +39,14 @@
         }
         #indicator {
             position: absolute;
-            top: -20px;
+            top: -30px;
             left: 50%;
-            transform: translateX(-50%) rotate(0deg);
+            transform: translateX(-50%) rotate(180deg); /* Pfeil korrekt drehen */
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-bottom: 20px solid red;
+            border-top: 20px solid red; /* Ändern zu border-top statt border-bottom */
         }
         #spin-button {
             margin-top: 20px;
@@ -106,7 +106,7 @@
     <button id="spin-button">Drehen!</button>
 
     <div id="coin-display">
-        <img src="https://example.com/mario_coin.png" alt="Coin">
+        <img src="https://i.pinimg.com/originals/14/47/c0/1447c03093de817e7d59c73cf9ca743b.png" alt="Coin">
         <span id="coins">10</span>
     </div>
 
@@ -222,9 +222,10 @@
                         requestAnimationFrame(animate);
                     } else {
                         // Ergebnis berechnen und nach dem Stopp Coins zuweisen
-                        const selectedSegment = Math.floor((segments - (finalAngle / 360) * segments) % segments);
+                        const selectedSegment = Math.floor(((currentRotation % 360) / 360) * segments);
+                        const result = wheelOptions[segments - selectedSegment - 1]; // Berechnung für das Segment oben beim Pfeil
+                        
                         setTimeout(() => {
-                            const result = wheelOptions[selectedSegment];
                             rewardText.textContent = `Du hast ${result} gewonnen!`;
                             rewardDisplay.style.display = 'block';
 
